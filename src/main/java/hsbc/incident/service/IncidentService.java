@@ -9,7 +9,7 @@ public interface IncidentService {
 
     Incident get(Long id);
 
-    Long save(IncidentVO incidentVO);
+    Long create(IncidentVO incidentVO);
 
     Boolean update(Long id, IncidentVO incidentVO);
 

@@ -9,7 +9,6 @@ import hsbc.incident.mapper.IncidentMapper;
 import hsbc.incident.service.IncidentService;
 import hsbc.incident.vo.IncidentVO;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,7 @@ public class IncidentServiceImpl extends ServiceImpl<IncidentMapper, Incident> i
     }
 
     @CacheEvict(value = "incidentListCache", allEntries = true)
-    public Long save(IncidentVO incidentVO) {
+    public Long create(IncidentVO incidentVO) {
         Incident incident = new Incident();
         incident.setDescription(incidentVO.getDescription());
         incident.setStatus(incidentVO.getStatus());
@@ -42,8 +41,10 @@ public class IncidentServiceImpl extends ServiceImpl<IncidentMapper, Incident> i
     }
 
 
-    @CachePut(value = "incidentCache", key = "#id")
-    @CacheEvict(value = "incidentListCache", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "incidentCache", key = "#id"),
+            @CacheEvict(value = "incidentListCache", allEntries = true)
+    })
     public Boolean update(Long id, IncidentVO incidentVO) {
         Incident incident = this.get(id);
         incident.setDescription(incidentVO.getDescription());

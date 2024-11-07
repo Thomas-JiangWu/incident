@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ConstraintViolationException.class})
     public Response<Object> onMethodArgumentNotValidException(ConstraintViolationException e, HttpServletRequest request) {
         String message = e.getConstraintViolations().stream()
-                .map(error -> String.format("%s%s", ((PathImpl) error.getPropertyPath()).getLeafNode(), error.getMessage()))
+                .map(error -> String.format("%s %s", ((PathImpl) error.getPropertyPath()).getLeafNode(), error.getMessage()))
                 .collect(Collectors.joining("; "));
         return Response.fail(Constants.RESPONSE_CODE_INVALID_PARAM, message);
     }
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Response<Object> onMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
         String message = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> String.format("%s%s", error.getField(), error.getDefaultMessage()))
+                .map(error -> String.format("%s %s", error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
         return Response.fail(Constants.RESPONSE_CODE_INVALID_PARAM, message);
     }

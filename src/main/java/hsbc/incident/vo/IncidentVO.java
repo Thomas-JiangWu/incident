@@ -7,8 +7,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class IncidentVO {
-    private Long id;
-
     @NotBlank(groups = ValidGroup.Create.class)
     private String description;
 

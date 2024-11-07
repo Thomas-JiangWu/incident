@@ -34,8 +34,8 @@ public class IncidentController {
     }
 
     @PostMapping
-    public Response<Long> save(@Validated(value = ValidGroup.Create.class) @RequestBody IncidentVO incidentVO) {
-        return Response.success(incidentService.save(incidentVO));
+    public Response<Long> create(@Validated(value = ValidGroup.Create.class) @RequestBody IncidentVO incidentVO) {
+        return Response.success(incidentService.create(incidentVO));
     }
 
     @PutMapping("/{id}")
