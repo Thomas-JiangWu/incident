@@ -15,6 +15,6 @@ public class Response<T> {
     }
 
     public static <T> Response<T> success(T data) {
-        return new Response<T>(Constants.RESPONSE_CODE_SUCCESS, "", data);
+        return new Response<T>(Constants.RESPONSE_CODE_SUCCESS, Constants.RESPONSE_MESSAGE_SUCCESS, data);
     }
 }

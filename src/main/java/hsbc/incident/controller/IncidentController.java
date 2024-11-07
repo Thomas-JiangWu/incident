@@ -39,12 +39,12 @@ public class IncidentController {
     }
 
     @PutMapping("/{id}")
-    public Incident update(@PathVariable Long id, @RequestBody IncidentVO incidentVO) {
-        return incidentService.update(id, incidentVO);
+    public Response<Boolean> update(@PathVariable Long id, @RequestBody IncidentVO incidentVO) {
+        return Response.success(incidentService.update(id, incidentVO));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        incidentService.delete(id);
+    public Response<Boolean> delete(@PathVariable Long id) {
+        return Response.success(incidentService.delete(id));
     }
 }

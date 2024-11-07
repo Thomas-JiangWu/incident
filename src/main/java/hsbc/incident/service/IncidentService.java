@@ -11,7 +11,7 @@ public interface IncidentService {
 
     Long save(IncidentVO incidentVO);
 
-    Incident update(Long id, IncidentVO incidentVO);
+    Boolean update(Long id, IncidentVO incidentVO);
 
-    void delete(Long id);
+    Boolean delete(Long id);
 }

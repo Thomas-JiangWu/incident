@@ -17,9 +17,10 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public Response<Object> oException(Exception e) {
-        return Response.fail(Constants.RESPONSE_CODE_INTERNAL_ERROR, e.getMessage());
+    // handle incident exception
+    @ExceptionHandler(IncidentException.class)
+    public Response<Object> onIncidentException(IncidentException e) {
+        return Response.fail(e.getCode(), e.getMessage());
     }
 
     // handle query param validation
