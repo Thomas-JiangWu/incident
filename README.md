@@ -4,10 +4,78 @@
 
 This is an example project about incidents management. It provides CRUD APIs to manage incidents:
 - POST /api/incidents: create an incident
+```json
+// input
+{
+  "description": "desc",
+  "status": "PENDING"
+}
+
+// output
+{
+  "statusCode": 0,
+  "message": "success",
+  "data": 1854569583036768258
+}
+```
 - GET /api/incidents: list incidents
+```json
+// output
+{
+    "statusCode": 0,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1854569583036768258,
+                "description": "desc",
+                "status": "PENDING"
+            }
+        ],
+        "total": 1,
+        "size": 10,
+        "current": 1,
+        "pages": 1
+    }
+}
+```
 - GET /api/incidents/{id}: get an incident
+```json
+// output
+{
+  "statusCode": 0,
+  "message": "success",
+  "data": {
+    "id": 1854569583036768258,
+    "description": "desc",
+    "status": "PENDING"
+  }
+}
+```
 - PUT /api/incidents/{id}: update an incident
+```json
+// input
+{
+  "description": "desc",
+  "status": "PENDING"
+}
+
+// output
+{
+  "statusCode": 0,
+  "message": "success",
+  "data": true
+}
+```
 - DELETE /api/incidents/{id}: delete an incident
+```json
+// ourput
+{
+    "statusCode": 0,
+    "message": "success",
+    "data": true
+}
+```
 
 ## Dependencies
 
