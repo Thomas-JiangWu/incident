@@ -7,6 +7,7 @@ import hsbc.incident.common.ValidGroup;
 import hsbc.incident.entity.Incident;
 import hsbc.incident.service.IncidentService;
 import hsbc.incident.vo.IncidentVO;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class IncidentController {
 
     @GetMapping
     public Response<Page<Incident>> list(@RequestParam(required = false, defaultValue = Constants.DEFAULT_PAGE_NUM) @Min(value = 1) Integer pageNum,
-                                         @RequestParam(required = false, defaultValue = Constants.DEFAULT_PAGE_SIZE) @Min(value = 1) Integer pageSize) {
+                                         @RequestParam(required = false, defaultValue = Constants.DEFAULT_PAGE_SIZE) @Range(min = 1, max = 100) Integer pageSize) {
         return Response.success(incidentService.list(pageNum, pageSize));
     }
 
