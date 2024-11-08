@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static com.example.incident.Utils.toJsonString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,14 +23,6 @@ class IntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    public static String toJsonString(Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /*
      * Integration Testing
@@ -43,8 +36,11 @@ class IntegrationTest {
 
         // create an incident
         IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setReporter("Thomas");
+        incidentVO.setTitle("an incident");
         incidentVO.setDescription("description");
-        incidentVO.setStatus("PENDING");
+        incidentVO.setStatus("Pending");
+        incidentVO.setPriority("Low");
         MvcResult result = mockMvc.perform(post("/api/incidents")
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -65,7 +61,7 @@ class IntegrationTest {
 
         // update the incident
         incidentVO.setDescription("modified description");
-        incidentVO.setStatus("FINISHED");
+        incidentVO.setStatus("Resolved");
         mockMvc.perform(put("/api/incidents/{id}", id)
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -76,7 +72,7 @@ class IntegrationTest {
         mockMvc.perform(get("/api/incidents/{id}", id))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data.description").value("modified description"))
-                .andExpect(jsonPath("$.data.status").value("FINISHED"));
+                .andExpect(jsonPath("$.data.status").value("Resolved"));
 
         // delete the incident
         mockMvc.perform(delete("/api/incidents/{id}", id))

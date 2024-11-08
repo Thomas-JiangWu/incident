@@ -8,8 +8,11 @@ This is an example project about incidents management. It provides CRUD APIs to 
 input:
 ```json
 {
-"description": "desc",
-"status": "PENDING"
+  "reporter": "Thomas",
+  "title": "an incident",
+  "description": "description",
+  "status": "Pending",
+  "priority": "Low"
 }
 ```
 output:
@@ -20,7 +23,17 @@ output:
   "data": 1
 }
 ```
-- GET /api/incidents?pageNum={pageNum}&pageSize={pageSize}: list incidents
+- GET /api/incidents?pageNum={pageNum}&pageSize={pageSize}&status={status}$priority={priority}: list incidents
+
+param:
+```json
+{
+    "pageNum": 1,
+    "pageSize": 10,
+    "status": "Pending", // Pending, Processing, Resolved
+    "priority": "Low" // Low, Medium, High
+}
+```
 
 output:
 ```json
@@ -30,9 +43,14 @@ output:
     "data": {
         "records": [
             {
-                "id": 1854569583036768258,
-                "description": "desc",
-                "status": "PENDING"
+                "id": 1,
+                "reporter": "Thomas",
+                "title": "an incident",
+                "description": "description",
+                "status": "Pending",
+                "priority": "Low",
+                "createdTime": "2024-11-08 10:15:19",
+                "modifiedTime": "2024-11-08 10:15:31"
             }
         ],
         "total": 1,
@@ -51,8 +69,13 @@ output:
   "message": "success",
   "data": {
     "id": 1,
-    "description": "desc",
-    "status": "PENDING"
+    "reporter": "Thomas",
+    "title": "an incident",
+    "description": "description",
+    "status": "Pending",
+    "priority": "Low",
+    "createdTime": "2024-11-08 10:15:19",
+    "modifiedTime": "2024-11-08 10:18:17"
   }
 }
 ```
@@ -62,7 +85,7 @@ input:
 ```json
 {
   "description": "desc",
-  "status": "PENDING"
+  "status": "Pending"
 }
 ```
 output:

@@ -5,7 +5,7 @@ import com.example.incident.entity.Incident;
 import com.example.incident.vo.IncidentVO;
 
 public interface IncidentService {
-    Page<Incident> list(Integer pageNum, Integer pageSize);
+    Page<Incident> list(String status, String priority, Integer pageNum, Integer pageSize);
 
     Incident get(Long id);
 

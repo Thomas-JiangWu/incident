@@ -1,11 +1,9 @@
 package com.example.incident;
 
 import com.example.incident.common.Constants;
-import com.example.incident.entity.Incident;
 import com.example.incident.mapper.IncidentMapper;
 import com.example.incident.service.IncidentService;
 import com.example.incident.vo.IncidentVO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.example.incident.Utils.toJsonString;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,12 +37,14 @@ class UnitTest {
         incidentMapper.delete(null);
     }
 
-    public static String toJsonString(Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public Long createIncident() {
+        IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setReporter("Thomas");
+        incidentVO.setTitle("an incident");
+        incidentVO.setDescription("description");
+        incidentVO.setStatus("Pending");
+        incidentVO.setPriority("Low");
+        return incidentService.create(incidentVO);
     }
 
     /*
@@ -52,8 +53,11 @@ class UnitTest {
     @Test
     void whenCreateIncident_shouldSucceed() throws Exception {
         IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setReporter("Thomas");
+        incidentVO.setTitle("an incident");
         incidentVO.setDescription("description");
-        incidentVO.setStatus("PENDING");
+        incidentVO.setStatus("Pending");
+        incidentVO.setPriority("Low");
         mockMvc.perform(post("/api/incidents")
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -69,8 +73,28 @@ class UnitTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_INVALID_PARAM))
                 .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.message", containsString("reporter must not be blank")))
+                .andExpect(jsonPath("$.message", containsString("title must not be blank")))
+                .andExpect(jsonPath("$.message", containsString("description must not be blank")))
                 .andExpect(jsonPath("$.message", containsString("status must not be blank")))
-                .andExpect(jsonPath("$.message", containsString("description must not be blank")));
+                .andExpect(jsonPath("$.message", containsString("priority must not be blank")));
+    }
+
+    @Test
+    void whenCreateIncidentInvalidParam_shouldFail() throws Exception {
+        IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setReporter("Thomas");
+        incidentVO.setTitle("an incident");
+        incidentVO.setDescription("description");
+        incidentVO.setStatus("unknown");
+        incidentVO.setPriority("unknown");
+        mockMvc.perform(post("/api/incidents")
+                        .content(toJsonString(incidentVO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_INVALID_PARAM))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.message", containsString("status must match \"Pending|Processing|Resolved\"")))
+                .andExpect(jsonPath("$.message", containsString("priority must match \"Low|Medium|High\"")));
     }
 
     /*
@@ -78,32 +102,29 @@ class UnitTest {
      */
     @Test
     void whenListIncident_shouldSucceed() throws Exception {
-        Incident incident = new Incident();
-        incident.setId(1L);
-        incident.setDescription("description");
-        incident.setStatus("PENDING");
-        incidentMapper.insert(incident);
-        incident.setId(2L);
-        incidentMapper.insert(incident);
-
+        createIncident();
         mockMvc.perform(get("/api/incidents"))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
-                .andExpect(jsonPath("$.data.records", hasSize(2)));
+                .andExpect(jsonPath("$.data.records", hasSize(1)));
     }
 
     @Test
     void whenListIncidentWithPagination_shouldSucceed() throws Exception {
-        Incident incident = new Incident();
-        incident.setId(1L);
-        incident.setDescription("description");
-        incident.setStatus("PENDING");
-        incidentMapper.insert(incident);
-        incident.setId(2L);
-        incidentMapper.insert(incident);
-
+        createIncident();
         mockMvc.perform(get("/api/incidents?pageNum=2&pageSize=1"))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data.records", hasSize(1)));
+    }
+
+    @Test
+    void whenListIncidentWithFilter_shouldSucceed() throws Exception {
+        createIncident();
+        mockMvc.perform(get("/api/incidents?status=Pending"))
+                .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
+                .andExpect(jsonPath("$.data.records", hasSize(1)));
+        mockMvc.perform(get("/api/incidents?status=Resolved"))
+                .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
+                .andExpect(jsonPath("$.data.records", hasSize(0)));
     }
 
     @Test
@@ -120,11 +141,7 @@ class UnitTest {
      */
     @Test
     void whenGetIncident_shouldSucceed() throws Exception {
-        IncidentVO incidentVO = new IncidentVO();
-        incidentVO.setDescription("description");
-        incidentVO.setStatus("PENDING");
-        Long id = incidentService.create(incidentVO);
-
+        Long id = createIncident();
         mockMvc.perform(get("/api/incidents/{id}", id))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data").isMap());
@@ -143,13 +160,11 @@ class UnitTest {
      */
     @Test
     void whenUpdateIncident_shouldSucceed() throws Exception {
-        IncidentVO incidentVO = new IncidentVO();
-        incidentVO.setDescription("description");
-        incidentVO.setStatus("PENDING");
-        Long id = incidentService.create(incidentVO);
+        Long id = createIncident();
 
+        IncidentVO incidentVO = new IncidentVO();
         incidentVO.setDescription("modified description");
-        incidentVO.setStatus("FINISHED");
+        incidentVO.setStatus("Pending");
         mockMvc.perform(put("/api/incidents/{id}", id)
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -161,7 +176,7 @@ class UnitTest {
     void whenUpdateIncidentNotExist_shouldFail() throws Exception {
         IncidentVO incidentVO = new IncidentVO();
         incidentVO.setDescription("modified description");
-        incidentVO.setStatus("FINISHED");
+        incidentVO.setStatus("Pending");
         mockMvc.perform(put("/api/incidents/{id}", -1)
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -170,16 +185,28 @@ class UnitTest {
                 .andExpect(jsonPath("$.message").value("incident id -1 not found"));
     }
 
+    @Test
+    void whenUpdateIncidentInvalidParam_shouldFail() throws Exception {
+        Long id = createIncident();
+
+        IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setStatus("unknown");
+        incidentVO.setPriority("unknown");
+        mockMvc.perform(put("/api/incidents/{id}", id)
+                        .content(toJsonString(incidentVO))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_INVALID_PARAM))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.message", containsString("status must match \"Pending|Processing|Resolved\"")))
+                .andExpect(jsonPath("$.message", containsString("priority must match \"Low|Medium|High\"")));
+    }
+
     /*
      * delete
      */
     @Test
     void whenDeleteIncident_shouldSucceed() throws Exception {
-        IncidentVO incidentVO = new IncidentVO();
-        incidentVO.setDescription("description");
-        incidentVO.setStatus("PENDING");
-        Long id = incidentService.create(incidentVO);
-
+        Long id = createIncident();
         mockMvc.perform(delete("/api/incidents/{id}", id))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data").value(true));

@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.example.incident.Utils.toJsonString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -45,8 +46,11 @@ public class StressTest {
     private void testAPI() {
         // create
         IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setReporter("Thomas");
+        incidentVO.setTitle("an incident");
         incidentVO.setDescription("description");
-        incidentVO.setStatus("PENDING");
+        incidentVO.setStatus("Pending");
+        incidentVO.setPriority("Low");
         MvcResult result = mockMvc.perform(post("/api/incidents")
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -64,7 +68,7 @@ public class StressTest {
 
         // update
         incidentVO.setDescription("modified description");
-        incidentVO.setStatus("FINISHED");
+        incidentVO.setStatus("Resolved");
         mockMvc.perform(put("/api/incidents/{id}", id)
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -75,13 +79,5 @@ public class StressTest {
         mockMvc.perform(delete("/api/incidents/{id}", id))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data").value(true));
-    }
-
-    public static String toJsonString(Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -24,9 +24,11 @@ public class IncidentController {
     }
 
     @GetMapping
-    public Response<Page<Incident>> list(@RequestParam(required = false, defaultValue = Constants.DEFAULT_PAGE_NUM) @Min(value = 1) Integer pageNum,
+    public Response<Page<Incident>> list(@RequestParam(required = false) String status,
+                                         @RequestParam(required = false) String priority,
+                                         @RequestParam(required = false, defaultValue = Constants.DEFAULT_PAGE_NUM) @Min(value = 1) Integer pageNum,
                                          @RequestParam(required = false, defaultValue = Constants.DEFAULT_PAGE_SIZE) @Range(min = 1, max = 100) Integer pageSize) {
-        return Response.success(incidentService.list(pageNum, pageSize));
+        return Response.success(incidentService.list(status, priority, pageNum, pageSize));
     }
 
     @GetMapping("/{id}")
@@ -40,7 +42,7 @@ public class IncidentController {
     }
 
     @PutMapping("/{id}")
-    public Response<Boolean> update(@PathVariable Long id, @RequestBody IncidentVO incidentVO) {
+    public Response<Boolean> update(@PathVariable Long id, @Validated(value = ValidGroup.Update.class) @RequestBody IncidentVO incidentVO) {
         return Response.success(incidentService.update(id, incidentVO));
     }
 
