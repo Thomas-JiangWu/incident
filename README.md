@@ -1,4 +1,4 @@
-# incident management
+# Incident Management
 
 ## Overview
 
@@ -103,10 +103,11 @@ There are 3 ways to run this project:
 mvn package -Dmaven.test.skip
 java -jar target/incident-1.0.0.war
 ```
-- Run this project using `Docker`, and the container image `thomasjiangangwu/incident:1.0.0` is built based on the Dockerfile of this project:
+- Run this project using `Docker`:
 ```sh
 docker run -d -p 8080:8080 thomasjiangangwu/incident:1.0.0
 ```
+The container image `thomasjiangangwu/incident:1.0.0` is built based on the Dockerfile of this project and can be pulled publicly.
 
 After running this project, you can access the APIs like bellow:
 ```sh
