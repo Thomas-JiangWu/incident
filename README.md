@@ -11,8 +11,8 @@ input:
   "reporter": "Thomas",
   "title": "an incident",
   "description": "description",
-  "status": "Pending",
-  "priority": "Low"
+  "status": "Pending", // Pending, Processing, Resolved
+  "priority": "Low" // Low, Medium, High
 }
 ```
 output:
