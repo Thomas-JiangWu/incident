@@ -111,6 +111,7 @@ class UnitTest {
     @Test
     void whenListIncidentWithPagination_shouldSucceed() throws Exception {
         createIncident();
+        createIncident();
         mockMvc.perform(get("/api/incidents?pageNum=2&pageSize=1"))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data.records", hasSize(1)));
