@@ -51,7 +51,7 @@ public class StressTest {
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Long id = JsonPath.read(result.getResponse().getContentAsString(), "$.data");
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.data");
 
         // get
         mockMvc.perform(get("/api/incidents/{id}", id))

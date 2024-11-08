@@ -1,12 +1,12 @@
 package com.example.incident;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.incident.common.Constants;
 import com.example.incident.entity.Incident;
 import com.example.incident.mapper.IncidentMapper;
+import com.example.incident.service.IncidentService;
 import com.example.incident.vo.IncidentVO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,26 +24,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UnitTest {
 
     @Autowired
+    IncidentService incidentService;
+
+    @Autowired
     IncidentMapper incidentMapper;
 
     @Autowired
     private MockMvc mockMvc;
-
-    // create 3 incidents with id 1, 2, 3 before each test
-    @BeforeEach
-    public void setUp() {
-        Incident incident = new Incident();
-        incident.setId(1L);
-        incident.setDescription("description");
-        incident.setStatus("PENDING");
-        incidentMapper.insert(incident);
-
-        incident.setId(2L);
-        incidentMapper.insert(incident);
-
-        incident.setId(3L);
-        incidentMapper.insert(incident);
-    }
 
     // delete all incidents after each test
     @AfterEach
@@ -91,13 +78,29 @@ class UnitTest {
      */
     @Test
     void whenListIncident_shouldSucceed() throws Exception {
+        Incident incident = new Incident();
+        incident.setId(1L);
+        incident.setDescription("description");
+        incident.setStatus("PENDING");
+        incidentMapper.insert(incident);
+        incident.setId(2L);
+        incidentMapper.insert(incident);
+
         mockMvc.perform(get("/api/incidents"))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
-                .andExpect(jsonPath("$.data.records", hasSize(3)));
+                .andExpect(jsonPath("$.data.records", hasSize(2)));
     }
 
     @Test
     void whenListIncidentWithPagination_shouldSucceed() throws Exception {
+        Incident incident = new Incident();
+        incident.setId(1L);
+        incident.setDescription("description");
+        incident.setStatus("PENDING");
+        incidentMapper.insert(incident);
+        incident.setId(2L);
+        incidentMapper.insert(incident);
+
         mockMvc.perform(get("/api/incidents?pageNum=2&pageSize=1"))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data.records", hasSize(1)));
@@ -117,7 +120,12 @@ class UnitTest {
      */
     @Test
     void whenGetIncident_shouldSucceed() throws Exception {
-        mockMvc.perform(get("/api/incidents/{id}", 1))
+        IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setDescription("description");
+        incidentVO.setStatus("PENDING");
+        Long id = incidentService.create(incidentVO);
+
+        mockMvc.perform(get("/api/incidents/{id}", id))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data").isMap());
     }
@@ -136,9 +144,13 @@ class UnitTest {
     @Test
     void whenUpdateIncident_shouldSucceed() throws Exception {
         IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setDescription("description");
+        incidentVO.setStatus("PENDING");
+        Long id = incidentService.create(incidentVO);
+
         incidentVO.setDescription("modified description");
         incidentVO.setStatus("FINISHED");
-        mockMvc.perform(put("/api/incidents/{id}", 1)
+        mockMvc.perform(put("/api/incidents/{id}", id)
                         .content(toJsonString(incidentVO))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
@@ -163,7 +175,12 @@ class UnitTest {
      */
     @Test
     void whenDeleteIncident_shouldSucceed() throws Exception {
-        mockMvc.perform(delete("/api/incidents/{id}", 1))
+        IncidentVO incidentVO = new IncidentVO();
+        incidentVO.setDescription("description");
+        incidentVO.setStatus("PENDING");
+        Long id = incidentService.create(incidentVO);
+
+        mockMvc.perform(delete("/api/incidents/{id}", id))
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data").value(true));
     }

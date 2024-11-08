@@ -51,7 +51,7 @@ class IntegrationTest {
                 .andExpect(jsonPath("$.statusCode").value(Constants.RESPONSE_CODE_SUCCESS))
                 .andExpect(jsonPath("$.data").isNumber())
                 .andReturn();
-        Long id = JsonPath.read(result.getResponse().getContentAsString(), "$.data");
+        Integer id = JsonPath.read(result.getResponse().getContentAsString(), "$.data");
 
         // get the created incident
         mockMvc.perform(get("/api/incidents/{id}", id))
