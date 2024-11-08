@@ -3,24 +3,27 @@
 ## Overview
 
 This is an example project about incidents management. It provides CRUD APIs to manage incidents:
-- POST /api/incidents: create an incident
-```json
-// input
-{
-  "description": "desc",
-  "status": "PENDING"
-}
+- POST /api/incidents: create an incident 
 
-// output
+input:
+```json
+{
+"description": "desc",
+"status": "PENDING"
+}
+```
+output:
+```json
 {
   "statusCode": 0,
   "message": "success",
-  "data": 1854569583036768258
+  "data": 1
 }
 ```
-- GET /api/incidents: list incidents
+- GET /api/incidents?pageNum={pageNum}&pageSize={pageSize}: list incidents
+
+output:
 ```json
-// output
 {
     "statusCode": 0,
     "message": "success",
@@ -40,27 +43,30 @@ This is an example project about incidents management. It provides CRUD APIs to 
 }
 ```
 - GET /api/incidents/{id}: get an incident
+
+output:
 ```json
-// output
 {
   "statusCode": 0,
   "message": "success",
   "data": {
-    "id": 1854569583036768258,
+    "id": 1,
     "description": "desc",
     "status": "PENDING"
   }
 }
 ```
 - PUT /api/incidents/{id}: update an incident
+
+input:
 ```json
-// input
 {
   "description": "desc",
   "status": "PENDING"
 }
-
-// output
+```
+output:
+```json
 {
   "statusCode": 0,
   "message": "success",
@@ -68,8 +74,9 @@ This is an example project about incidents management. It provides CRUD APIs to 
 }
 ```
 - DELETE /api/incidents/{id}: delete an incident
+
+output:
 ```json
-// ourput
 {
     "statusCode": 0,
     "message": "success",
@@ -87,7 +94,7 @@ This project is developed using Java 17 and Maven 3.6.3. Apart from the Spring B
 - Caffeine: a high-performance caching library.
 - JUnit: a test automation framework.
 
-## How to Run
+## How to Run this Project
 
 There are 3 ways to run this project:
 - Run this project in an IDE, e.g. `IDEA`.
@@ -105,3 +112,8 @@ After running this project, you can access the APIs like bellow:
 ```sh
 curl http://localhost:8080/api/incidents
 ```
+
+## Frontpage Project
+
+There is another companion React [frontpage project](https://github.com/Thomas-JiangWu/incident-frontpage?tab=readme-ov-file) for this project, which supports adding/modifying/deleting incidents and displaying the incident list on the page. Please refer to the project documentation to run the project.
+
